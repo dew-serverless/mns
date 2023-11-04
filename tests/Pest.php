@@ -54,5 +54,7 @@ function result(array $data, int $status = 200): Result
 
 function integrationTestEnabled(): bool
 {
-    return getenv('INTEGRATION_TEST_ENABLED') === '1';
+    $value = getenv('INTEGRATION_TEST_ENABLED');
+
+    return filter_var($value, FILTER_VALIDATE_BOOLEAN);
 }
