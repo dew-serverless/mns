@@ -1,0 +1,39 @@
+name: Integration Test
+
+on:
+  push:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        php: ['8.1', '8.2']
+        dependency-version: [prefer-lowest, prefer-stable]
+
+    name: PHP ${{ matrix.php }} - ${{ matrix.dependency-version }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          tools: composer:v2
+          coverage: none
+
+      - name: Install Dependencies
+        run: composer update --${{ matrix.dependency-version }} --no-interaction --no-progress --ansi
+
+      - name: Run Test Cases
+        run: composer run test:integration
+        env:
+          INTEGRATION_TEST_ENABLED: true
+          ACS_ACCESS_KEY_ID: ${{ secrets.ACS_ACCESS_KEY_ID }}
+          ACS_ACCESS_KEY_SECRET: ${{ secrets.ACS_ACCESS_KEY_SECRET }}
+          MNS_ENDPOINT: ${{ secrets.MNS_ENDPOINT }}

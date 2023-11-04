@@ -1,0 +1,33 @@
+includes:
+    - vendor/phpstan/phpstan-strict-rules/rules.neon
+    - vendor/ergebnis/phpstan-rules/rules.neon
+
+parameters:
+    level: max
+    paths:
+        - src
+
+    ergebnis:
+        final:
+            classesNotRequiredToBeAbstractOrFinal:
+                - Dew\Mns\Versions\V20150606\Results\Result
+        noExtends:
+            classesAllowedToBeExtended:
+                - Dew\Mns\Versions\V20150606\Api
+                - Dew\Mns\Versions\V20150606\Models\Model
+                - Dew\Mns\Versions\V20150606\Results\Result
+                - Exception
+        noNullableReturnTypeDeclaration:
+            enabled: false
+        noParameterWithNullDefaultValue:
+            enabled: false
+        noParameterWithNullableTypeDeclaration:
+            enabled: false
+        noConstructorParameterWithDefaultValue:
+            enabled: false
+
+    ignoreErrors:
+        -
+            # https://github.com/phpstan/phpstan/issues/8837
+            message: '#Cannot call method [a-zA-Z0-9]+\(\) on DOMDocument\|null.#'
+            path: src/MnsXml.php
