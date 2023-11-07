@@ -19,6 +19,13 @@ use Psr\Http\Message\ResponseInterface;
 final class MnsClient
 {
     /**
+     * The request options.
+     *
+     * @var array<string, mixed>
+     */
+    private array $config = [];
+
+    /**
      * The signature builder.
      */
     private BuildsSignature $signature;
@@ -73,6 +80,18 @@ final class MnsClient
     public function accessKeySecret(): string
     {
         return $this->accessKeySecret;
+    }
+
+    /**
+     * Configure request options.
+     *
+     * @param  array<string, mixed>  $config
+     */
+    public function configure(array $config): self
+    {
+        $this->config = $config;
+
+        return $this;
     }
 
     /**
@@ -198,11 +217,24 @@ final class MnsClient
      */
     private function client(): Client
     {
-        return new Client([
+        return new Client([...$this->getConfiguration(), ...[
             'base_uri' => $this->endpoint,
-            'timeout' => 30.0,
             'handler' => $this->createHandler(),
-        ]);
+        ]]);
+    }
+
+    /**
+     * Get configuration for Guzzle client.
+     *
+     * @return array<string, mixed>
+     */
+    private function getConfiguration(): array
+    {
+        $default = [
+            'timeout' => 60.0,
+        ];
+
+        return [...$default, ...$this->config];
     }
 
     /**
